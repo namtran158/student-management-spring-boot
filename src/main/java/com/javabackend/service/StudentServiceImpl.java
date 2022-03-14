@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.javabackend.common.exception.InvalidStudentException;
+import com.javabackend.common.exception.NotFoundException;
 import com.javabackend.model.Student;
 import com.javabackend.repository.StudentRepository;
 
@@ -19,7 +21,12 @@ public class StudentServiceImpl implements StudentService {
 	
 	@Override
 	public List<Student> findAllStudents() {
-		return repository.findAll();
+		List<Student> students = repository.findAll();
+		
+		if(students.isEmpty()) {
+			throw new NotFoundException("List student null.");
+		}
+		return students;
 	}
 
 	@Override
@@ -31,19 +38,38 @@ public class StudentServiceImpl implements StudentService {
 	public Student updateStudent(long id, Student student) {
 		Optional<Student> studentOpt = repository.findById(id);
 		
+		if(!studentOpt.isPresent())
+			throw new InvalidStudentException("Student id is not valid.");
+		
 		Student updateStudent = studentOpt.get();
 		
+		if(!updateStudent.getEmail().equals(student.getEmail())) {
+			if(repository.findByEmail(student.getEmail()).isPresent()) {
+				throw new InvalidStudentException("Student email has been used");
+			}
+			updateStudent.setEmail(student.getEmail());
+		}
+		
+		if(!updateStudent.getCode().equals(student.getCode())) {
+			if(repository.findByCode(student.getCode()).isPresent()) {
+				throw new InvalidStudentException("Student code has been used");
+			}
+			updateStudent.setCode(student.getCode());
+		}
+		
 		updateStudent.setFullname(student.getFullname());
-		updateStudent.setCode(student.getCode());
 		updateStudent.setAddress(student.getAddress());
-		updateStudent.setEmail(student.getEmail());
 		updateStudent.setPhoneNum(student.getPhoneNum());
+		
 		return repository.save(updateStudent);
 	}
 
 	@Override
 	public void deleteStudent(long id) {
 		Optional<Student> studentOpt = repository.findById(id);
+		
+		if(!studentOpt.isPresent())
+			throw new InvalidStudentException("Student ID is not existed.");
 		
 		Student deleteStudent = studentOpt.get();
 		
