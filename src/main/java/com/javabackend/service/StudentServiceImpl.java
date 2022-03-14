@@ -31,6 +31,15 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public Student create(Student student) {
+		
+		List<Student> students = repository.findAll();
+		
+		for(Student stud : students) {
+			if(student.getCode().equals(stud.getCode()) || student.getEmail().equals(stud.getEmail())) {
+				throw new InvalidStudentException("Student code or student email have been used.");
+			}
+		}
+		
 		return repository.save(student);
 	}
 
@@ -57,9 +66,15 @@ public class StudentServiceImpl implements StudentService {
 			updateStudent.setCode(student.getCode());
 		}
 		
+		if(!updateStudent.getPhoneNum().equals(student.getPhoneNum())) {
+			if(repository.findByPhoneNum(student.getPhoneNum()).isPresent()) {
+				throw new InvalidStudentException("Student phone number has been used.");
+			}
+			updateStudent.setPhoneNum(student.getPhoneNum());
+		}
+		
 		updateStudent.setFullname(student.getFullname());
 		updateStudent.setAddress(student.getAddress());
-		updateStudent.setPhoneNum(student.getPhoneNum());
 		
 		return repository.save(updateStudent);
 	}
