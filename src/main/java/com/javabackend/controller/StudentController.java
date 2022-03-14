@@ -1,6 +1,7 @@
 package com.javabackend.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,7 @@ public interface StudentController {
 		@ApiResponse(responseCode = "400", description = "invalid student")
 	})
 	@PostMapping(value = "/student", produces = "application/json")
-	public ResponseEntity<Object> createStudent(@RequestBody Student student);
+	public ResponseEntity<Object> createStudent(@RequestBody Student student, BindingResult bindingResult);
 	
 	@Operation(method = "put", description = "update student")
 	@ApiResponses({
@@ -38,7 +39,8 @@ public interface StudentController {
 		@ApiResponse(responseCode = "400", description = "invalid student")
 	})
 	@PutMapping(value = "/student/{id}", produces = "application/json")
-	public ResponseEntity<Object> updateStudent(@PathVariable("id") long id, @RequestBody Student student);
+	public ResponseEntity<Object> updateStudent(@PathVariable("id") long id, @RequestBody Student student,
+			BindingResult bindingResult);
 	
 	@Operation(method = "put", description = "update student")
 	@ApiResponses({

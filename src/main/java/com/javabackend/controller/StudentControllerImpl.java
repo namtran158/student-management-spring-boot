@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.javabackend.common.ResponseHandler;
 import com.javabackend.model.Student;
 import com.javabackend.service.StudentService;
 
@@ -21,25 +23,33 @@ public class StudentControllerImpl implements StudentController {
 	@Override
 	public ResponseEntity<Object> getStudents() {
 		List<Student> students = service.findAllStudents();
-		return new ResponseEntity<>(students, HttpStatus.OK);
+		return ResponseHandler.getResponse(students, HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<Object> createStudent(Student student) {
+	public ResponseEntity<Object> createStudent(Student student, BindingResult bindingResult) {
+		if(bindingResult.hasErrors())
+			return ResponseHandler.getErrorResponse(bindingResult, HttpStatus.BAD_REQUEST);
+		
 		Student createdStudent = service.create(student);
-		return new ResponseEntity<>(createdStudent, HttpStatus.CREATED);
+		
+		return ResponseHandler.getResponse(createdStudent, HttpStatus.CREATED);
 	}
 
 	@Override
-	public ResponseEntity<Object> updateStudent(long id, Student student) {
+	public ResponseEntity<Object> updateStudent(long id, Student student,  BindingResult bindingResult) {
+		if(bindingResult.hasErrors())
+			return ResponseHandler.getErrorResponse(bindingResult, HttpStatus.BAD_REQUEST);
+		
 		Student updatedStudent = service.updateStudent(id, student);
-		return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+		
+		return ResponseHandler.getResponse(updatedStudent, HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<Object> deleteStudent(long id) {
 		service.deleteStudent(id);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return ResponseHandler.getResponse(HttpStatus.OK);
 	}
 
 
